@@ -8,68 +8,104 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: home(),
+      home: HomeWidget(),
+    );
+  }
+}
+
+class HomeWidget extends StatefulWidget {
+  @override
+  _HomeWidgetState createState() => _HomeWidgetState();
+}
+
+class AppState {
+  bool loading;
+  String user;
+
+  AppState(this.loading, this.user);
+}
+
+class _HomeWidgetState extends State<HomeWidget> {
+  final app = AppState(true, "");
+
+  @override
+  void initState() {
+    super.initState();
+    _delay();
+  }
+
+  _delay() {
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() => app.loading = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (app.loading) {
+      return _loading();
+    }
+
+    if (app.user.isEmpty) {
+      return _signIn();
+    }
+    return _main();
+  }
+
+  /**
+   * 로딩 화면
+   */
+  Widget _loading() {
+    return Scaffold(
+      appBar: AppBar(title: Text("Loading..")),
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 
-  Widget home() {
+  Widget _signIn() {
     return Scaffold(
-        appBar: AppBar(
-          leading: Icon(Icons.menu),
-          title: Text("SSD"),
-          actions: <Widget>[
-            IconButton(
-                onPressed: () {
-                  print("누름");
-                },
-                icon: Icon(Icons.mode_comment)),
-            IconButton(
-                onPressed: () => print("asdf"), icon: Icon(Icons.money_off))
+      appBar: AppBar(title: Text("Login Page")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text("id"),
+            Text("pass"),
+            RaisedButton(
+              child: Text("Login"),
+              onPressed: () {
+                setState(() {
+                  app.loading = true;
+                  app.user = "손소독";
+                  _delay();
+                });
+              },
+            )
           ],
         ),
-        body: body());
-  }
-
-  Widget body() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: testList(),
+      ),
     );
   }
 
-  Widget testList() {
-    List<String> items = List.generate(101, (i) => "List 출력 테스트 $i");
-
-    return ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, i) {
-          return ListTile(
-            title: Text(items[i]),
-            subtitle: Text('$i번째 List'),
-          );
-        });
-  }
-
-  Widget cols() {
-    return Column(
-      children: <Widget>[rows(), rows(), rows()],
-    );
-  }
-
-  Widget rows() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        Text("1111"),
-        Text("2222"),
-        Text("3333"),
-        Text("4444"),
-        Text("5555"),
-        Text("6666"),
-        Text("7777"),
-        Text("8888"),
-        Text("9999")
-      ],
+  Widget _main() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(app.user),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.account_circle),
+            onPressed: () {
+              setState(() {
+                app.user = "";
+                app.loading = true;
+                _delay();
+              });
+            },
+          )
+        ],
+      ),
+      body: Center(child: Text("contents")),
     );
   }
 }
